@@ -79,5 +79,3 @@ Logs are written to `app.log` by default. Adjust logging settings in `log.py` as
 Used `black` and `pylint` for formatting and linting.
 
 Please reach out to me at `iangfernandes96@gmail.com` in case you have any issues/clarifications required.
-
-`Ian Fernandes`
