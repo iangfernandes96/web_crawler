@@ -1,14 +1,15 @@
 #!/usr/bin/python3
+# pylint: disable=E0401
 
 """
     Module: main
     Description: FastAPI application configuration and startup logic.
 """
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from routes.crawl import router
 from s3_client import s3_client
-from contextlib import asynccontextmanager
 from log import LOGGER as log
 from config import S3_BUCKET_NAME
 
@@ -18,7 +19,7 @@ def run_startup():
     Run startup logic for the FastAPI application, such as creating an S3 bucket. # noqa
     """
     response = s3_client.create_bucket(Bucket=S3_BUCKET_NAME)
-    if response.get('HTTPStatusCode') == 200:
+    if response.get("HTTPStatusCode") == 200:
         log.debug("Created bucket successfully")
     else:
         log.debug("Failed to create bucket")

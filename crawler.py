@@ -16,10 +16,10 @@ Example: python crawler.py https://example.com 3
 
 import asyncio
 import sys
+from io import BytesIO
 from web_crawler import WebCrawler
 from config import OUTPUT_FILE
 from log import LOGGER as log
-from io import BytesIO
 
 
 def start_crawl(url: str, depth: int) -> None:
@@ -78,7 +78,7 @@ def start_crawl_worker(url: str, depth: int):
     output_file_bytes.seek(0)
 
     # Suggested filename based on the URL
-    file_name = f'crawled_result-{url}.tsv'
+    file_name = f"crawled_result-{url}.tsv"
     return output_file_bytes, file_name
 
 

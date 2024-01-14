@@ -35,12 +35,9 @@ def crawl_task(url, depth):
     log.info("Picked up crawl task")
     file_bytes, file_name = start_crawl_worker(url, depth)
     upload_file_object_to_s3(file_bytes, S3_BUCKET_NAME, file_name)
-    params = {
-        'Bucket': S3_BUCKET_NAME,
-        'Key': file_name
-    }
-    res = get_presigned_s3_link('get_object', params=params, expiration=30000)
-    return {'s3_link': res}
+    params = {"Bucket": S3_BUCKET_NAME, "Key": file_name}
+    res = get_presigned_s3_link("get_object", params=params, expiration=30000)
+    return {"s3_link": res}
 
 
 celery_worker.conf.task_routes = {

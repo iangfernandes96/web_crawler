@@ -30,17 +30,18 @@ Example:
 
 from urllib.parse import urlparse, urljoin
 from typing import Optional, Coroutine
+from asyncio import TimeoutError
+from io import BytesIO
+
 
 import asyncio
 import aiohttp
 import aiofiles as aiof
 from aiohttp import ClientSession, ClientError, InvalidURL, ClientTimeout
-from asyncio import TimeoutError
 from lxml import html
 from config import DEFAULT_URL_PROTOCOL, DEFAULT_RETRY_COUNT, DEFAULT_BACKOFF
 from utils import get_random_float
 from log import LOGGER as log
-from io import BytesIO
 
 
 class WebCrawler:
@@ -91,7 +92,9 @@ class WebCrawler:
         self.fetched_urls = set()
         self.timeout = ClientTimeout(connect=5, total=15)
 
-    def add_protocol(self, url: str, protocol: str = DEFAULT_URL_PROTOCOL) -> str:
+    def add_protocol(
+        self, url: str, protocol: str = str(DEFAULT_URL_PROTOCOL)
+    ) -> str:  # noqa
         """
         Adds a protocol (HTTP/HTTPS) to the provided URL if no protocol
         is specified. Returns the modified URL with the added protocol.
@@ -201,6 +204,25 @@ class WebCrawler:
         )  # noqa
 
     async def write_to_file(self, output_file: str, content: str) -> None:
+        """
+        Asynchronously writes content to a file.
+
+        Args:   # noqa
+        - output_file (str): The path to the file where the content will be written.
+        - content (str): The content to be written to the file.
+
+        Returns:
+        - None
+
+        This function uses the `aiofiles` library to asynchronously open the file in
+        append mode and write the specified content. It is intended for use in asynchronous
+        contexts and should be awaited when called.
+
+        Example:
+        ```python
+        await write_to_file("example.txt", "Hello, world!")
+        ```
+        """
         async with aiof.open(output_file, "a", encoding="utf-8") as file:
             await file.write(content)
 

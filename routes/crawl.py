@@ -8,7 +8,7 @@ Description: FastAPI router for initiating and monitoring crawling tasks.
 from fastapi import APIRouter
 from pydantic import BaseModel
 from celery.result import AsyncResult
-from tasks.crawl import (celery_worker, crawl_task)
+from tasks.crawl import celery_worker, crawl_task
 
 
 router = APIRouter()
@@ -18,6 +18,7 @@ class CrawlRequest(BaseModel):
     """
     Pydantic model for the request body when initiating a crawl task.
     """
+
     url: str
     max_depth: int
 
