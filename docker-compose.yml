@@ -4,10 +4,24 @@ services:
     image: redis
     ports:
       - "6379:6379"
+  localstack:
+    container_name: "localstack"
+    image: localstack/localstack
+    ports:
+      - "127.0.0.1:4566:4566" # LocalStack Gateway
+      - "127.0.0.1:4510-4559:4510-4559" # external services port range
+    environment:
+      # LocalStack configuration: https://docs.localstack.cloud/references/configuration/
+      - DEBUG=${DEBUG:-0}
+      - AWS_ACCESS_KEY_ID=foobar
+      - AWS_DEFAULT_REGION=foobar
+      - AWS_SECRET_ACCESS_KEY=foobar
+    volumes:
+      - .:/app
   app:
     container_name: app
     build: .
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload --log-level=debug
     volumes:
       - .:/app
     ports:
@@ -15,6 +29,7 @@ services:
     restart: always
     depends_on:
       - redis
+      - localstack
   celery_worker:
     container_name: celery_worker
     build: .

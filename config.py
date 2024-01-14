@@ -11,3 +11,4 @@ OUTPUT_FILE = "output.tsv"
 DEFAULT_RETRY_COUNT = 3
 DEFAULT_BACKOFF = 1
 LOG_FILE = "app.log"
+S3_BUCKET_NAME = 'crawl-bucket'

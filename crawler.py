@@ -17,9 +17,10 @@ Example: python crawler.py https://example.com 3
 import asyncio
 import sys
 from web_crawler import WebCrawler
-from config import OUTPUT_FILE
+from config import OUTPUT_FILE, S3_BUCKET_NAME
 from log import LOGGER as log
 from io import BytesIO
+from s3_client import client
 
 
 # @time_calculator
@@ -59,8 +60,15 @@ def start_crawl_bytes(url: str, depth: int):
 
     asyncio.run(crawler.crawl_bytes(url, 1, depth, output_file_bytes))
     log.debug(f"Number of URLs traversed: {len(crawler.fetched_urls)}")
-    content_bytes = output_file_bytes.getvalue()
-    return {"total_length": len(content_bytes)}
+    output_file_bytes.seek(0)
+    client.upload_fileobj(output_file_bytes, S3_BUCKET_NAME, 'test_file.tsv')
+    resp = client.generate_presigned_url('get_object',
+                                         Params={
+                                             'Bucket': S3_BUCKET_NAME,
+                                             'Key': 'test_file.tsv'
+                                         },
+                                         ExpiresIn=30000)
+    return {"total_length": resp}
 
 
 if __name__ == "__main__":
