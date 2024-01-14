@@ -16,13 +16,12 @@ Example: python crawler.py https://example.com 3
 
 import asyncio
 import sys
+from io import BytesIO
 from web_crawler import WebCrawler
 from config import OUTPUT_FILE
 from log import LOGGER as log
-from io import BytesIO
 
 
-# @time_calculator
 def start_crawl(url: str, depth: int) -> None:
     """
     Initiates web crawling from a specified URL up to a given depth.
@@ -50,7 +49,24 @@ def start_crawl(url: str, depth: int) -> None:
     log.debug(f"Number of URLs traversed: {len(crawler.fetched_urls)}")
 
 
-def start_crawl_bytes(url: str, depth: int):
+def start_crawl_worker(url: str, depth: int):
+    """
+    Initiates a web crawl using a WebCrawler, writes the output to a BytesIO object,
+    and returns the BytesIO object along with a suggested filename.
+
+    Args:
+    - url (str): The starting URL for crawling. # noqa
+    - depth (int): The depth to which the crawler should explore.
+
+    Returns:
+    - Tuple[BytesIO, str]: A tuple containing a BytesIO object with the crawl result
+      and a suggested filename for the result.
+
+    This function initializes a WebCrawler, sets up the necessary parameters,
+    and runs the crawling process using asyncio. It writes the output to a BytesIO
+    object as bytes, logs the number of URLs traversed during the process,
+    and returns the BytesIO object along with a suggested filename based on the URL.
+    """
     crawler = WebCrawler()
     url = crawler.add_protocol(url)
 
@@ -59,8 +75,11 @@ def start_crawl_bytes(url: str, depth: int):
 
     asyncio.run(crawler.crawl_bytes(url, 1, depth, output_file_bytes))
     log.debug(f"Number of URLs traversed: {len(crawler.fetched_urls)}")
-    content_bytes = output_file_bytes.getvalue()
-    return {"total_length": len(content_bytes)}
+    output_file_bytes.seek(0)
+
+    # Suggested filename based on the URL
+    file_name = f"crawled_result-{url}.tsv"
+    return output_file_bytes, file_name
 
 
 if __name__ == "__main__":
