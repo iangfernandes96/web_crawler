@@ -1,5 +1,9 @@
 #!/usr/bin/python3
 
+"""
+    FastAPI server init
+"""
+
 from fastapi import FastAPI
 from routes.crawl import router
 

@@ -16,16 +16,16 @@ class CrawlRequest(BaseModel):
 
 @router.post("/crawl/")
 async def crawl(request: CrawlRequest):
-    result = crawl_task.delay(request.url, request.max_depth) # noqa
+    result = crawl_task.delay(request.url, request.max_depth)  # noqa
     task_id = result.id
-    return {'task_id': task_id}
+    return {"task_id": task_id}
 
 
 @router.post("/simple/")
 async def simple():
     result = simple_task.delay()
     task_id = result.id
-    return {'task_id': task_id}
+    return {"task_id": task_id}
 
 
 @router.get("/crawl/status/{task_id}")

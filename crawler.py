@@ -42,7 +42,7 @@ def start_crawl(url: str, depth: int) -> None:
     url = crawler.add_protocol(url)
     log.info(f"Starting crawl for URL: {url}")
 
-    with open(OUTPUT_FILE, 'w', newline='', encoding='utf-8') as output_file:
+    with open(OUTPUT_FILE, "w", newline="", encoding="utf-8") as output_file:
         output_file.write("url\tdepth\tratio\n")
 
     asyncio.run(crawler.crawl(url, 1, depth, OUTPUT_FILE))
@@ -55,12 +55,12 @@ def start_crawl_bytes(url: str, depth: int):
     url = crawler.add_protocol(url)
 
     output_file_bytes = BytesIO()
-    output_file_bytes.write("url\tdepth\tratio\n".encode('utf-8'))
+    output_file_bytes.write("url\tdepth\tratio\n".encode("utf-8"))
 
     asyncio.run(crawler.crawl_bytes(url, 1, depth, output_file_bytes))
     log.debug(f"Number of URLs traversed: {len(crawler.fetched_urls)}")
     content_bytes = output_file_bytes.getvalue()
-    return {'total_length': len(content_bytes)}
+    return {"total_length": len(content_bytes)}
 
 
 if __name__ == "__main__":

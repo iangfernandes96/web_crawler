@@ -82,16 +82,16 @@ class WebCrawler:
         asyncio.run(crawler.crawl('https://example.com', 1, 3, output_file))
     """
 
-    __slots__ = ("fetched_urls", "timeout",)
+    __slots__ = (
+        "fetched_urls",
+        "timeout",
+    )
 
     def __init__(self) -> None:
         self.fetched_urls = set()
-        self.timeout = ClientTimeout(connect=5,
-                                     total=15)
+        self.timeout = ClientTimeout(connect=5, total=15)
 
-    def add_protocol(
-        self, url: str, protocol: str = DEFAULT_URL_PROTOCOL
-    ) -> str:
+    def add_protocol(self, url: str, protocol: str = DEFAULT_URL_PROTOCOL) -> str:
         """
         Adds a protocol (HTTP/HTTPS) to the provided URL if no protocol
         is specified. Returns the modified URL with the added protocol.
@@ -174,7 +174,9 @@ class WebCrawler:
             log.exception(f"Error extracting links: {e}")
             return set()
 
-    def calculate_same_domain_ratio(self, current_url: str, links: set) -> float:  # noqa
+    def calculate_same_domain_ratio(
+        self, current_url: str, links: set
+    ) -> float:  # noqa
         """
         Calculates the ratio of same-domain links in comparison to the
         total links provided.
@@ -194,10 +196,12 @@ class WebCrawler:
         same_domain_count = sum(
             urlparse(link).netloc == current_domain for link in links
         )  # noqa
-        return round(same_domain_count / len(links), 2) if len(links) > 0 else 0.0  # noqa
+        return (
+            round(same_domain_count / len(links), 2) if len(links) > 0 else 0.0
+        )  # noqa
 
     async def write_to_file(self, output_file: str, content: str) -> None:
-        async with aiof.open(output_file, 'a', encoding='utf-8') as file:
+        async with aiof.open(output_file, "a", encoding="utf-8") as file:
             await file.write(content)
 
     async def crawl(
@@ -269,7 +273,10 @@ class WebCrawler:
                 links = self.fetch_links(html_content, url)
                 same_domain_ratio = self.calculate_same_domain_ratio(url, links)  # noqa
                 output_content = f"{url}\t{depth}\t{same_domain_ratio}\n"
-                output_file.write(output_content.encode('utf-8'))
-                tasks = [self.crawl_bytes(link, depth+1, max_depth, output_file) for link in links] # noqa
+                output_file.write(output_content.encode("utf-8"))
+                tasks = [
+                    self.crawl_bytes(link, depth + 1, max_depth, output_file)
+                    for link in links
+                ]  # noqa
                 await asyncio.gather(*tasks)
         return output_file
