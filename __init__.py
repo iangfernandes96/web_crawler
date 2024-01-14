@@ -14,6 +14,8 @@ from .config import (
     DEFAULT_BACKOFF,
 )
 from .log import LOGGER
+from .main import app
+from .routes.crawl import router
 
 __all__ = [
     "time_calculator",
@@ -25,4 +27,6 @@ __all__ = [
     "LOG_FILE",
     "LOGGER",
     "DEFAULT_BACKOFF",
+    "app",
+    "router",
 ]

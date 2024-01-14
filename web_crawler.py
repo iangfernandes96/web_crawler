@@ -40,6 +40,7 @@ from lxml import html
 from config import DEFAULT_URL_PROTOCOL, DEFAULT_RETRY_COUNT, DEFAULT_BACKOFF
 from utils import get_random_float
 from log import LOGGER as log
+from io import BytesIO
 
 
 class WebCrawler:
@@ -248,3 +249,27 @@ class WebCrawler:
                     for link in links
                 ]
                 await asyncio.gather(*tasks)
+
+    async def crawl_bytes(
+        self, url: str, depth: int, max_depth: int, output_file: BytesIO
+    ):
+        if depth > max_depth or url in self.fetched_urls:
+            return
+
+        self.fetched_urls.add(url)
+
+        async with aiohttp.ClientSession() as session:
+            try:
+                html_content = await self.fetch_page_async(session, url)
+            except Exception as e:
+                log.exception(f"Failed to crawl: {url}, with exception: {e}")
+                return
+
+            if html_content:
+                links = self.fetch_links(html_content, url)
+                same_domain_ratio = self.calculate_same_domain_ratio(url, links)  # noqa
+                output_content = f"{url}\t{depth}\t{same_domain_ratio}\n"
+                output_file.write(output_content.encode('utf-8'))
+                tasks = [self.crawl_bytes(link, depth+1, max_depth, output_file) for link in links] # noqa
+                await asyncio.gather(*tasks)
+        return output_file

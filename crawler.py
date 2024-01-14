@@ -15,14 +15,14 @@ Example: python crawler.py https://example.com 3
 """
 
 import asyncio
-from utils import time_calculator
 import sys
 from web_crawler import WebCrawler
 from config import OUTPUT_FILE
 from log import LOGGER as log
+from io import BytesIO
 
 
-@time_calculator
+# @time_calculator
 def start_crawl(url: str, depth: int) -> None:
     """
     Initiates web crawling from a specified URL up to a given depth.
@@ -40,6 +40,7 @@ def start_crawl(url: str, depth: int) -> None:
     """
     crawler = WebCrawler()
     url = crawler.add_protocol(url)
+    log.info(f"Starting crawl for URL: {url}")
 
     with open(OUTPUT_FILE, 'w', newline='', encoding='utf-8') as output_file:
         output_file.write("url\tdepth\tratio\n")
@@ -47,6 +48,19 @@ def start_crawl(url: str, depth: int) -> None:
     asyncio.run(crawler.crawl(url, 1, depth, OUTPUT_FILE))
 
     log.debug(f"Number of URLs traversed: {len(crawler.fetched_urls)}")
+
+
+def start_crawl_bytes(url: str, depth: int):
+    crawler = WebCrawler()
+    url = crawler.add_protocol(url)
+
+    output_file_bytes = BytesIO()
+    output_file_bytes.write("url\tdepth\tratio\n".encode('utf-8'))
+
+    asyncio.run(crawler.crawl_bytes(url, 1, depth, output_file_bytes))
+    log.debug(f"Number of URLs traversed: {len(crawler.fetched_urls)}")
+    content_bytes = output_file_bytes.getvalue()
+    return {'total_length': len(content_bytes)}
 
 
 if __name__ == "__main__":

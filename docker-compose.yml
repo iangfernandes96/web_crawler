@@ -1,0 +1,34 @@
+version: '3.4'
+services:
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+  app:
+    container_name: app
+    build: .
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/app
+    ports:
+      - 8000:8000
+    restart: always
+    depends_on:
+      - redis
+  celery_worker:
+    container_name: celery_worker
+    build: .
+    command: celery -A tasks.crawl.celery_worker worker --loglevel=debug -P solo --without-gossip -E
+    volumes:
+      - .:/app
+    depends_on:
+      - redis
+  flower:
+    container_name: flower
+    build: .
+    command: celery -A tasks.crawl  flower --port=5555
+    ports:
+      - 5556:5555
+    depends_on:
+      - redis
+      - celery_worker
